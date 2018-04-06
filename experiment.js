@@ -12,20 +12,20 @@ function numberRange (start, end) {
 /* define welcome message trial */
 var welcome = {
   type: "html-keyboard-response",
-  stimulus: "Welcome to the experiment. Press any key to begin."
+  stimulus: "<p class='instructions'>Welcome to the experiment. Press any key to begin.</p>"
 };
 rsvp_task_experiment.push(welcome);
 
 /* define instructions trial */
 var instructions = {
   type: "html-keyboard-response",
-  stimulus: "<p>You will see a series of letters and numbers rapidly " +
+  stimulus: "<div class='instructions'><p>You will see a series of letters and numbers rapidly " +
             "appearing on the computer screen. Your task is to remember " +
             "the digits in the series.</p><p>When the series ends, you have to " +
             "respond to the question ‘which two digits did you see?’</p><p>You " +
             "type in the digits you saw (order does not matter), and then " +
             "another series will appear.</p>" +
-            "<p>Press any key to begin.</p>",
+            "<p>Press any key to begin.</p></div>",
   post_trial_gap: 2000
 };
 rsvp_task_experiment.push(instructions);
@@ -91,7 +91,7 @@ var response = {
   stimulus: '<div class="rsvp">Which two targets did you see?</div>',
   choices: numbers,
   data: jsPsych.timelineVariable('data'),
-  // FIXME: trial duration for timeout
+  trial_duration: 2000,
   /*
   store accuracy for both?
   on_finish: function(data){
@@ -108,6 +108,7 @@ for (trial in design) {  // loop over Array indexes
   			{
   				stimulus: "<span class='rsvp'>" + stimuli[stimulus] + "</span>",
   				data: { test_part: 'test' }
+  				// FIXME: add correct responses
   			}
   		);
 	}
@@ -120,6 +121,7 @@ for (trial in design) {  // loop over Array indexes
 	rsvp_task_experiment.push(blank);
 	rsvp_task_experiment.push(test_procedure);
 	//FIXME: need 2 responses
+	rsvp_task_experiment.push(response);
 	rsvp_task_experiment.push(response);
 }
 
