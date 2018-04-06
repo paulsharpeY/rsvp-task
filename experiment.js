@@ -1,15 +1,6 @@
-/* create timeline */
-var rsvp_task_experiment = [];
+var rsvp_task_experiment = []; // main timeline
 
-/* functions */
-function alphabetRange (start, end) {
-  return new Array(end.charCodeAt(0) - start.charCodeAt(0) + 1).fill().map((d, i) => String.fromCharCode(i + start.charCodeAt(0)));
-}
-function numberRange (start, end) {
-  return new Array(end - start + 1).fill().map((d, i) => i + start);
-}
-
-/* define welcome message trial */
+// welcome message
 var welcome = {
   type: "html-keyboard-response",
   stimulus: "<p class='instructions'>Welcome to the experiment. Press any key to begin.</p>",
@@ -17,7 +8,7 @@ var welcome = {
 };
 rsvp_task_experiment.push(welcome);
 
-/* define instructions trial */
+// instructions
 var instructions = {
   type: "html-keyboard-response",
   stimulus: "<div class='instructions'><p>You will see a series of letters and numbers rapidly " +
@@ -32,23 +23,11 @@ var instructions = {
 };
 rsvp_task_experiment.push(instructions);
 
-/* practice trials */
-
-/* test trials */
+// RSVP stimuli
 var letters = alphabetRange('A', 'Z');
 var numbers = alphabetRange('2', '9');
 
-function rsvp_trial(o) {
-	var stimuli                    = jsPsych.randomization.sampleWithoutReplacement(letters, 20);
-	var targets                    = jsPsych.randomization.sampleWithoutReplacement(numbers, 2);
-	stimuli[o.t1_location]         = targets[0];
-	stimuli[o.t1_location + o.lag] = targets[1];
-
-	return({stimuli: stimuli, targets: targets.map(jsPsych.pluginAPI.convertKeyCharacterToKeyCode)});
-}
-
-// static stimuli
-
+// stimuli definitions
 var rsvp_iti = {
     type: 'html-keyboard-response',
     stimulus: '<span></span>',
@@ -82,9 +61,8 @@ var response_block = {
   stimulus: jsPsych.timelineVariable('stimulus'),
   choices: numbers,
   data: jsPsych.timelineVariable('data'),
-  trial_duration: 10000,
-  on_finish: function(data){
-  	// FIXME: T1 and T2 accuracy
+  trial_duration: 5000,
+  on_finish: function(data) {
     data.correct    = data.correct_responses.includes(data.key_press); // accuracy irrespective of order
     if ( ! data.lag ) {                                                // only T2 has a lag
 	    data.t1_correct = data.correct_response == data.key_press;     // T1 accuracy
@@ -94,77 +72,19 @@ var response_block = {
   }
 }
 
-/* build practice trials */
-
-/* build test trials */
+// Factorial design
+// 3 locations x 4 lags = 12
 var factors = {
     t1_location: [7, 8, 9],
     lag: [1, 3, 5, 8]
-}
-var design = jsPsych.randomization.factorial(factors, 1);
+};
+var practice_repetitions = 2;
+var test_repetitions     = 12;
 
-trial_number = 0;
-for (trial in design) {
-	trial_number++;
-	rsvp_stimuli = rsvp_trial(design[trial]);
+// make slow instruction trial
 
-	// RSVP: 18 letters, 2 number targets
-	var rsvp_block_stimuli = [];
-	for (stimulus in rsvp_stimuli.stimuli) {
-		rsvp_block_stimuli.push(
-  			{
-  				stimulus: "<span class='rsvp'>" + rsvp_stimuli.stimuli[stimulus] + "</span>",
-  				data: {
-  					test_part: 'rsvp',
-  					stim: rsvp_stimuli.stimuli[stimulus],
-  					trial_number: trial_number
-  				}
-  			}
-  		);
-	}
-	// attach RSVP stimuli to a timeline
-	var test_procedure = {
-		timeline: [rsvp_stimulus_block, rsvp_iti],
-		timeline_variables: rsvp_block_stimuli
-	}
-
-	// 2 responses
-  	var rsvp_response_stimuli = [];
-  	// T1
-  	rsvp_response_stimuli.push(
-		{
-			stimulus:'<div class="rsvp">Which two targets did you see?</div>',
-			data: {
-				test_part: 'response',
-				correct_responses: rsvp_stimuli.targets,
-				correct_response: rsvp_stimuli.targets[0],
-				trial_number: trial_number
-			}
-		}
-	);
-  	// T2
-	rsvp_response_stimuli.push(
-		{
-			stimulus:'<div class="rsvp">Which two targets did you see?</div>',
-			data: {
-				test_part: 'response',
-				correct_responses: rsvp_stimuli.targets,
-				correct_response: rsvp_stimuli.targets[1],
-				lag: design[trial].lag,
-				trial_number: trial_number
-			}
-		}
-	);
-	// attach responses to timeline
-	var response_procedure = {
-		timeline: [response_block],
-		timeline_variables: rsvp_response_stimuli
-	}
-	rsvp_task_experiment.push(fixation);
-	rsvp_task_experiment.push(blank);
-	rsvp_task_experiment.push(test_procedure);
-	rsvp_task_experiment.push(response_procedure);
-}
+/* make 24 practice trials (2 repetitions)*/
+make_block(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice');
 
 var debrief_block = {
   type: "html-keyboard-response",
@@ -173,11 +93,106 @@ var debrief_block = {
     var correct_trials = trials.filter({correct: true});
     var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
     var rt = Math.round(correct_trials.select('rt').mean());
-
-    return "<p>You responded correctly on "+accuracy+"% of the trials.</p>"+
-    "<p>Your average response time was "+rt+"ms.</p>"+
-    "<p>Press any key to complete the experiment. Thank you!</p>";
-
+/*
+    if (>= 50% correct) {
+    	// only push this when they pass the test?!  what test?  The _practice_ test!
+    } else {
+    	// repeat practice
+	    return "<p>You responded correctly on "+accuracy+"% of the trials.</p>"+
+	    "<p>Your average response time was "+rt+"ms.</p>"+
+	    "<p>Press any key to complete the experiment. Thank you!</p>";
+	}
+*/
   }
 };
-rsvp_task_experiment.push(debrief_block);
+//rsvp_task_experiment.push(debrief_block);
+
+
+// build 144 test trials (12 repetitions)
+make_block(jsPsych.randomization.factorial(factors, test_repetitions), 'test');
+
+
+/** functions **/
+function alphabetRange (start, end) {
+  return new Array(end.charCodeAt(0) - start.charCodeAt(0) + 1).fill().map((d, i) => String.fromCharCode(i + start.charCodeAt(0)));
+}
+function numberRange (start, end) {
+  return new Array(end - start + 1).fill().map((d, i) => i + start);
+}
+
+function rsvp_trial(o) {
+	var stimuli                    = jsPsych.randomization.sampleWithoutReplacement(letters, 20);
+	var targets                    = jsPsych.randomization.sampleWithoutReplacement(numbers, 2);
+	stimuli[o.t1_location]         = targets[0];
+	stimuli[o.t1_location + o.lag] = targets[1];
+
+	return({stimuli: stimuli, targets: targets.map(jsPsych.pluginAPI.convertKeyCharacterToKeyCode)});
+}
+
+function make_block(design, phase) {
+	trial_number = 0;
+	for (trial in design) {
+		trial_number++;
+		rsvp_stimuli = rsvp_trial(design[trial]);
+
+		// RSVP: 18 letters, 2 number targets
+		var rsvp_block_stimuli = [];
+		for (stimulus in rsvp_stimuli.stimuli) {
+			rsvp_block_stimuli.push(
+	  			{
+	  				stimulus: "<span class='rsvp'>" + rsvp_stimuli.stimuli[stimulus] + "</span>",
+	  				data: {
+	  					phase: phase,
+	  					test_part: 'rsvp',
+	  					stim: rsvp_stimuli.stimuli[stimulus],
+	  					trial_number: trial_number
+	  				}
+	  			}
+	  		);
+		}
+		// attach RSVP stimuli to a timeline
+		var test_procedure = {
+			timeline: [rsvp_stimulus_block, rsvp_iti],
+			timeline_variables: rsvp_block_stimuli
+		}
+
+		// 2 responses
+	  	var rsvp_response_stimuli = [];
+	  	// T1
+	  	rsvp_response_stimuli.push(
+			{
+				stimulus:'<div class="rsvp">Which two targets did you see?</div>',
+				data: {
+					phase: phase,
+					test_part: 'response',
+					correct_responses: rsvp_stimuli.targets,
+					correct_response: rsvp_stimuli.targets[0],
+					trial_number: trial_number
+				}
+			}
+		);
+	  	// T2
+		rsvp_response_stimuli.push(
+			{
+				stimulus:'<div class="rsvp">Which two targets did you see?</div>',
+				data: {
+					phase: phase,
+					test_part: 'response',
+					correct_responses: rsvp_stimuli.targets,
+					correct_response: rsvp_stimuli.targets[1],
+					lag: design[trial].lag,
+					trial_number: trial_number
+				}
+			}
+		);
+		// attach responses to timeline
+		var response_procedure = {
+			timeline: [response_block],
+			timeline_variables: rsvp_response_stimuli
+		}
+		rsvp_task_experiment.push(fixation);
+		rsvp_task_experiment.push(blank);
+		rsvp_task_experiment.push(test_procedure);
+		rsvp_task_experiment.push(response_procedure);
+	}
+}
