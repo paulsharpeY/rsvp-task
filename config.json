@@ -1,0 +1,14 @@
+{
+    "name": "Rapid Serial Visual Presentation (RSVP) Task",
+    "exp_id": "rsvp-task",
+    "url": "https://www.github.com/earcanal/rsvp-task/",
+    "description":"RSVP task for testing attentional blink (Colzato, Sellaro, Samara, Baas, & Hommel, 2015).",
+    "instructions": "N/A",
+    "template":"jspsych",
+    "cognitive_atlas_task_id": "",
+    "contributors": [
+                     "Paul Sharpe"
+                    ], 
+    "time":10,
+    "reference": ["https://www.sciencedirect.com/science/article/pii/S1053810015300210"]
+}
