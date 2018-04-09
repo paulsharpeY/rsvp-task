@@ -120,7 +120,7 @@ var performance_block = {
   	var practice_trials = practice_repetitions * 12;
   	var correct         = 0;
   	for (i = 1; i <= practice_trials; i++) {
-  		var trials         = jsPsych.data.get().filter({phase: 'practice' + pratice_block});
+  		var trials         = jsPsych.data.get().filter({phase: 'practice' + practice_block});
 	    trials             = trials.filter({trial_number: i});
 		var correct_trials = trials.filter({correct: true});
 		if (correct_trials.count() > 1) correct++;
@@ -142,7 +142,7 @@ var performance_block = {
     } else {
     	// practice accuracy too low, so repeat practice
     	pratice_block++;
-    	var practice_timeline = make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice' + pratice_block);
+    	var practice_timeline = make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice' + practice_block);
     	practice_timeline.timeline.push(performance_block);
     	jsPsych.addNodeToEndOfTimeline(practice_timeline, function(){});
 	    var feedback = "<div class='instructions'><p>You responded correctly on "+accuracy+"% of the trials.</p>" +
@@ -153,7 +153,7 @@ var performance_block = {
   }
 };
 // make initial practice block
-rsvp_task.push(make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice' + pratice_block));
+rsvp_task.push(make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice' + practice_block));
 rsvp_task.push(performance_block);
 
 
