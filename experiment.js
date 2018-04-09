@@ -1,5 +1,10 @@
 var rsvp_task = []; // main timeline
 
+// RSVP stimuli
+var letters          = alphabetRange('A', 'Z');
+var numbers          = alphabetRange('2', '9');
+var response_choices = keyCodeRange('2', '9');
+
 // stimuli definitions
 var rsvp_iti = {
     type: 'html-keyboard-response',
@@ -46,11 +51,10 @@ var rsvp_demo_stimulus_block = {
 var response_block = {
   type: "html-keyboard-response",
   stimulus: jsPsych.timelineVariable('stimulus'),
-  // FIXME: Any key press accepted
-  choices: numbers,
+  prompt: jsPsych.timelineVariable('prompt'),
+  choices: response_choices,
   data: jsPsych.timelineVariable('data'),
   trial_duration: 5000,
-  prompt: '<p class="rsvp">(press a number key)</p>',
   on_finish: function(data) {
     data.correct    = data.correct_responses.includes(data.key_press); // accuracy irrespective of order
     if ( ! data.lag ) {                                                // only T2 has a lag
@@ -60,10 +64,6 @@ var response_block = {
 	}
   }
 }
-
-// RSVP stimuli
-var letters = alphabetRange('A', 'Z');
-var numbers = alphabetRange('2', '9');
 
 // welcome message
 var welcome = {
@@ -112,7 +112,7 @@ var factors = {
     lag: [1, 3, 5, 8]
 };
 var practice_repetitions = 1;
-var test_repetitions     = 12;
+var test_repetitions     = 1;
 
 var performance_block = {
   type: "html-keyboard-response",
@@ -127,13 +127,22 @@ var performance_block = {
 		if (correct_trials.count() > 1) correct++;
   	}
     var accuracy = Math.round(correct / practice_trials * 100);
-    if (accuracy >= 50) {  // you passed the test
-    	// build test trials
+    if (accuracy >= 50) {
+    	// practice accuracy achieved, so build test trials
     	var test_timeline = make_rsvp_timeline(jsPsych.randomization.factorial(factors, test_repetitions), 'test');
 		jsPsych.addNodeToEndOfTimeline(test_timeline, function(){});
+		var thanks = {
+		  type: "html-keyboard-response",
+		  stimulus: "<p class='instructions'>Thank you for completing this task.</p><p>Press any key to continue.</p>",
+		  trial_duration: 10000,
+		  data: {test_part: 'end'}
+		};
+		jsPsych.addNodeToEndOfTimeline(thanks, function(){});
+rsvp_task.push(welcome);
 		var feedback = "<div class='instructions'><p>Well done!  You responded correctly on "+accuracy+"% of the trials.</p>" +
 	    "<p>Press any key to start the test.</p></div>";
-    } else {               // repeat practice
+    } else {
+    	// practice accuracy too low, so repeat practice
     	var practice_timeline = make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice');
     	practice_timeline.timeline.push(performance_block);
     	jsPsych.addNodeToEndOfTimeline(practice_timeline, function(){});
@@ -144,7 +153,7 @@ var performance_block = {
 	return feedback;
   }
 };
-// make practice block
+// make initial practice block
 rsvp_task.push(make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice'));
 rsvp_task.push(performance_block);
 
@@ -152,6 +161,10 @@ rsvp_task.push(performance_block);
 /** functions **/
 function alphabetRange (start, end) {
   return new Array(end.charCodeAt(0) - start.charCodeAt(0) + 1).fill().map((d, i) => String.fromCharCode(i + start.charCodeAt(0)));
+}
+function keyCodeRange (start, end) {
+	var start = start.charCodeAt(0);
+  return new Array(end.charCodeAt(0) - start + 1).fill().map((d, i) => i + start);
 }
 function numberRange (start, end) {
   return new Array(end - start + 1).fill().map((d, i) => i + start);
@@ -209,6 +222,7 @@ function make_rsvp_timeline(trials, phase) {
 	  	rsvp_response_stimuli.push(
 			{
 				stimulus:'<div class="rsvp">Which two targets did you see?</div>',
+				prompt: '<p class="rsvp">(press a number key)</p>',
 				data: {
 					phase: phase,
 					test_part: 'response',
@@ -222,6 +236,7 @@ function make_rsvp_timeline(trials, phase) {
 		rsvp_response_stimuli.push(
 			{
 				stimulus:'<div class="rsvp">Which two targets did you see?</div>',
+				prompt: '<p class="rsvp">(press another number key)</p>',
 				data: {
 					phase: phase,
 					test_part: 'response',
