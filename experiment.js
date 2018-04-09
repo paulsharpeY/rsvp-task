@@ -111,8 +111,8 @@ var factors = {
     t1_location: [7, 8, 9],
     lag: [1, 3, 5, 8]
 };
-var practice_repetitions = 1;
-var test_repetitions     = 1;
+var practice_repetitions = 2;
+var test_repetitions     = 12;
 var pratice_block        = 0;
 
 var performance_block = {
