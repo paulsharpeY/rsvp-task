@@ -112,7 +112,7 @@ var factors = {
 };
 var practice_repetitions = 2;
 var test_repetitions     = 12;
-var pratice_block        = 0;
+var practice_block       = 0;
 
 var performance_block = {
   type: "html-keyboard-response",
