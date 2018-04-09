@@ -65,6 +65,11 @@ var response_block = {
   }
 }
 
+rsvp_task.push({
+  type: 'fullscreen',
+  fullscreen_mode: true
+});
+
 // welcome message
 var welcome = {
   type: "html-keyboard-response",
@@ -121,7 +126,6 @@ var performance_block = {
   	var practice_trials = practice_repetitions * 12;
   	var correct         = 0;
   	for (i = 1; i <= practice_trials; i++) {
-  		//FIXME: this filter won't work if they have to repeat practice
   		var trials         = jsPsych.data.get().filter({phase: 'practice' + pratice_block});
 	    trials             = trials.filter({trial_number: i});
 		var correct_trials = trials.filter({correct: true});
