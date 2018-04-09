@@ -2,8 +2,12 @@
 Colzato, L. S., Sellaro, R., Samara, I., Baas, M., & Hommel, B. (2015).
 Meditation-induced states predict attentional control over time. Consciousness and Cognition, 37, 57–62.
 */
+
+.jspsych-display-element {
+   overflow-y: hidden;
+ }
 body {
-  background-color: #808080;
+  	background-color: #808080;
 }
 .rsvp {
 	font-family: "Times New Roman", Times, serif;

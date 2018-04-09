@@ -56,27 +56,21 @@ var response_block = {
   data: jsPsych.timelineVariable('data'),
   trial_duration: 5000,
   on_finish: function(data) {
-    data.correct    = data.correct_responses.includes(data.key_press); // accuracy irrespective of order
-    if ( ! data.lag ) {                                                // only T2 has a lag
-	    data.t1_correct = data.correct_response == data.key_press;     // T1 accuracy
+    data.correct = data.correct_responses.includes(data.key_press); // accuracy irrespective of order
+    if ( ! data.lag ) {                                             // only T2 has a lag
+	    data.t1_correct = data.correct_response == data.key_press;  // T1 accuracy
 	} else {
-	    data.t2_correct = data.correct_response == data.key_press;     // T2 accuracy
+	    data.t2_correct = data.correct_response == data.key_press;  // T2 accuracy
 	}
   }
 }
 
+// full screen
 rsvp_task.push({
   type: 'fullscreen',
+  message: '<div class="instructions"><p>Welcome to the experiment.</p><p>Press the button below to begin in full screen mode.</p></div>',
   fullscreen_mode: true
 });
-
-// welcome message
-var welcome = {
-  type: "html-keyboard-response",
-  stimulus: "<p class='instructions'>Welcome to the experiment. Press any key to begin.</p>",
-  data: {test_part: 'instructions'}
-};
-rsvp_task.push(welcome);
 
 // instructions
 var instructions_1 = {
