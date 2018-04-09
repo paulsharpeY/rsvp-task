@@ -137,7 +137,6 @@ var performance_block = {
 		  data: {test_part: 'end'}
 		};
 		jsPsych.addNodeToEndOfTimeline(thanks, function(){});
-rsvp_task.push(welcome);
 		var feedback = "<div class='instructions'><p>Well done!  You responded correctly on "+accuracy+"% of the trials.</p>" +
 	    "<p>Press any key to start the test.</p></div>";
     } else {
