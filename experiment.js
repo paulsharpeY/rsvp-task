@@ -113,6 +113,7 @@ var factors = {
 };
 var practice_repetitions = 1;
 var test_repetitions     = 1;
+var pratice_block        = 0;
 
 var performance_block = {
   type: "html-keyboard-response",
@@ -121,7 +122,7 @@ var performance_block = {
   	var correct         = 0;
   	for (i = 1; i <= practice_trials; i++) {
   		//FIXME: this filter won't work if they have to repeat practice
-  		var trials         = jsPsych.data.get().filter({phase: 'practice'});
+  		var trials         = jsPsych.data.get().filter({phase: 'practice' + pratice_block});
 	    trials             = trials.filter({trial_number: i});
 		var correct_trials = trials.filter({correct: true});
 		if (correct_trials.count() > 1) correct++;
@@ -133,7 +134,7 @@ var performance_block = {
 		jsPsych.addNodeToEndOfTimeline(test_timeline, function(){});
 		var thanks = {
 		  type: "html-keyboard-response",
-		  stimulus: "<p class='instructions'>Thank you for completing this task.</p><p>Press any key to continue.</p>",
+		  stimulus: "<div class='instructions'><p>Thank you for completing this task.</p><p>Press any key to continue.</p></div>",
 		  trial_duration: 10000,
 		  data: {test_part: 'end'}
 		};
@@ -143,7 +144,8 @@ rsvp_task.push(welcome);
 	    "<p>Press any key to start the test.</p></div>";
     } else {
     	// practice accuracy too low, so repeat practice
-    	var practice_timeline = make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice');
+    	pratice_block++;
+    	var practice_timeline = make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice' + pratice_block);
     	practice_timeline.timeline.push(performance_block);
     	jsPsych.addNodeToEndOfTimeline(practice_timeline, function(){});
 	    var feedback = "<div class='instructions'><p>You responded correctly on "+accuracy+"% of the trials.</p>" +
@@ -154,7 +156,7 @@ rsvp_task.push(welcome);
   }
 };
 // make initial practice block
-rsvp_task.push(make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice'));
+rsvp_task.push(make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice' + pratice_block));
 rsvp_task.push(performance_block);
 
 
