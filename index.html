@@ -36,13 +36,11 @@ $( document ).ready(function() {
                      $.ajax({
                          type: "POST",
                          url: '/save',
-                         timeout: 1000*60*30,
                          data: { "data": data },
                          success: function(){ document.location = "/next" },
                          dataType: "application/json",
                          // FIXME: https://github.com/expfactory/expfactory/issues/76
                          error: function(err) {
-                            alert(err.status)
                              if (err.status == 200) {          // endpoint not running
                                 document.location = "/next"
                              } else {                          // local save
