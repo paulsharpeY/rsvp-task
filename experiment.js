@@ -111,7 +111,7 @@ var factors = {
     lag: [1, 3, 5, 8]
 };
 var practice_repetitions = 1;
-var test_repetitions     = 2;
+var test_repetitions     = 6;
 var practice_block       = 0;
 
 var performance_block = {
