@@ -141,7 +141,7 @@ var performance_block = {
 	    "<p>Press any key to start the test.</p></div>";
     } else {
     	// practice accuracy too low, so repeat practice
-    	pratice_block++;
+    	practice_block++;
     	var practice_timeline = make_rsvp_timeline(jsPsych.randomization.factorial(factors, practice_repetitions), 'practice' + practice_block);
     	practice_timeline.timeline.push(performance_block);
     	jsPsych.addNodeToEndOfTimeline(practice_timeline, function(){});
