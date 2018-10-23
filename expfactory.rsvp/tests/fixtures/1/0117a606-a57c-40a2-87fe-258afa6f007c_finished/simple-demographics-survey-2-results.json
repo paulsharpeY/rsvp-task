@@ -1,0 +1,13 @@
+{
+    "data[0][name]": "simple-demographics-survey-2_1_options",
+    "data[0][options]": "Male|Female",
+    "data[0][text]": "What was your assigned sex at birth?",
+    "data[0][value]": "0",
+    "data[1][name]": "simple-demographics-survey-2_2",
+    "data[1][text]": "How old are you (in years)?",
+    "data[1][value]": "19",
+    "data[2][name]": "simple-demographics-survey-2_3_1_options",
+    "data[2][options]": "Left|Right|Ambidextrous",
+    "data[2][text]": "Which is your dominant hand?",
+    "data[2][value]": "Right"
+}
