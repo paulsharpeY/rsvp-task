@@ -29,9 +29,35 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c('correct','correct_respo
 #' @export
 #' @return Data frame
 process_rsvp <- function(path, p) {
-  expfactory::process_expfactory_experiment(path) %>%
-    filter(test_part %in% c('rsvp', 'response')) %>%
-    mutate(token = p) %>%
-    select(token, rt, trial_number, stim, key_press, lag, correct_responses, correct, correct_response,
-           t1_correct, t2_correct, phase, test_part)
+  df <- expfactory::process_expfactory_experiment(path) %>%
+      filter(test_part %in% c('response') & phase != 'instructions') %>%
+      mutate(token = p) %>%
+      select(token, rt, trial_number, stim, key_press, lag, correct_responses, correct, correct_response,
+             t1_correct, t2_correct, phase, test_part)
+  
+  # combine pairs of rows into single rows for each trial with analysis-friendly columns 
+  rsvp <- data.frame()
+  for(i in 0:(nrow(df)/2-1)) {
+    r1 <- i*2+1 # response 1
+    r2 <- i*2+2 # response 2
+    row <- df[r1,c('token','trial_number','phase')]
+    row[1,'t1_rt'] <- df[r1,c('rt')]
+    row[1,'t2_rt'] <- df[r2,c('rt')]
+    row[1,'lag'] <- df[r2,'lag']
+    correct <- c(df[r1,'correct_response'], df[r2,'correct_response'])
+    
+    row[1,'t1_correct'] <- ifelse(df[r1,'key_press'] %in% correct, TRUE, FALSE)
+    # t2|t1
+    if(row[1,'t1_correct']) {
+      if(df[r2,'key_press'] %in% correct & df[r2,'key_press'] != df[r1,'key_press']) {
+        row[1,'t2|t1'] <- TRUE   # T2 is correct if it's one of the correct numbers, and it isn't the same as the T1 response
+      } else {
+        row[1,'t2|t1'] <- FALSE
+      } 
+    } else {
+      row[1,'t2|t1'] <- FALSE
+    }
+    rsvp <- rbind(rsvp, row)
+  }
+  return(rsvp)
 }
